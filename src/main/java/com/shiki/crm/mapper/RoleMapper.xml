@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shiki.crm.mapper.RoleMapper" >
+  <resultMap id="BaseResultMap" type="com.shiki.crm.domain.Role" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="sn" property="sn" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from role
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.shiki.crm.domain.Role" useGeneratedKeys="true" keyProperty="id" >
+    insert into role (name, sn)
+    values (#{name,jdbcType=VARCHAR}, #{sn,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.shiki.crm.domain.Role" >
+    update role
+    set name = #{name,jdbcType=VARCHAR},
+      sn = #{sn,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select id, name, sn
+    from role
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, name, sn
+    from role
+  </select>
+  <select id="queryForPageCount" resultType="long">
+    select count(*) from role r
+  </select>
+  <!--注意，这里只从role表查询单纯的角色，不关联查询角色对应的permission-->
+  <select id="queryForPage" resultMap="BaseResultMap">
+    select * from role r
+    <if test="page!=null">
+      limit #{start}, #{rows}
+    </if>
+  </select>
+  <!--中间表维护-->
+  <insert id="handerPermission">
+    insert into role_permission (r_id, p_id) values (#{rid}, #{pid})
+  </insert>
+  <delete id="deletePermissionByRid">
+    delete from role_permission where r_id = #{id}
+  </delete>
+  <select id="queryRoleIdByEid" resultType="long">
+    select r_id from emp_role where e_id = #{eid}
+  </select>
+</mapper>
